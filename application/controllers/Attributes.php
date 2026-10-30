@@ -320,6 +320,10 @@ class Attributes extends Admin_Controller
 	*/
 	public function createValue()
 	{
+		if (!in_array('createAttribute', $this->permission)) {
+			redirect('dashboard', 'refresh');
+		}
+
 		$response = array();
 
 		$this->form_validation->set_rules('attribute_value_name', 'Attribute value', 'trim|required');
@@ -382,6 +386,9 @@ class Attributes extends Admin_Controller
 	*/
 	public function updateValue($id)
 	{
+		if (!in_array('updateAttribute', $this->permission)) {
+			redirect('dashboard', 'refresh');
+		}
 
 		$response = array();
 
@@ -447,6 +454,9 @@ class Attributes extends Admin_Controller
 	*/
 	public function removeValue()
 	{
+		if (!in_array('deleteAttribute', $this->permission)) {
+			redirect('dashboard', 'refresh');
+		}
 
 		$attribute_value_id = $this->input->post('attribute_value_id');
 
