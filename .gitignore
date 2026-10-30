@@ -19,3 +19,8 @@ application/logs/*
 # local credentials: never commit
 Credentials.txt
 Login.txt
+
+# node / playwright
+node_modules/
+test-results/
+playwright-report/

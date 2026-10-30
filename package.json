@@ -1,0 +1,12 @@
+{
+  "name": "deltaone",
+  "private": true,
+  "scripts": {
+    "test:http": "node --test --test-concurrency=1 tests/",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1"
+  }
+}
