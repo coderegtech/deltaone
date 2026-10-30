@@ -639,6 +639,7 @@ VALUES (4, 2, 440, '1', '2000', '2000.00'),
 CREATE TABLE `products` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `part_number` varchar(255) NOT NULL DEFAULT '',
   `sku` varchar(255) NOT NULL,
   `price` varchar(255) NOT NULL,
   `qty` varchar(255) NOT NULL,
@@ -649,7 +650,8 @@ CREATE TABLE `products` (
   `category_id` text NOT NULL,
   `store_id` int(11) NOT NULL,
   `availability` int(11) NOT NULL,
-  `low_quantity` int(11) NOT NULL
+  `low_quantity` int(11) NOT NULL,
+  `high_quantity` int(11) NOT NULL DEFAULT 0
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_general_ci;
 --
 -- Dumping data for table `products`
@@ -6390,7 +6392,8 @@ CREATE TABLE `work_order` (
   `extra2` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `attachments` text DEFAULT NULL
+  `attachments` text DEFAULT NULL,
+  `signatures` longtext DEFAULT NULL
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 --
 -- Dumping data for table `work_order`
