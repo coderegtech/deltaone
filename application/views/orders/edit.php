@@ -55,21 +55,21 @@
                   <div class="form-group">
                     <label for="gross_amount" class="col-sm-5 control-label" style="text-align:left;">Customer Name</label>
                     <div class="col-sm-7">
-                      <input type="text" class="form-control" id="customer_name" name="customer_name" placeholder="Enter Customer Name" value="<?php echo $order_data['order']['customer_name'] ?>" autocomplete="off"/>
+                      <input type="text" class="form-control" id="customer_name" name="customer_name" placeholder="Enter Customer Name" value="<?php echo html_escape($order_data['order']['customer_name']) ?>" autocomplete="off"/>
                     </div>
                   </div>
 
                   <div class="form-group">
                     <label for="gross_amount" class="col-sm-5 control-label" style="text-align:left;">Customer Address</label>
                     <div class="col-sm-7">
-                      <input type="text" class="form-control" id="customer_address" name="customer_address" placeholder="Enter Customer Address" value="<?php echo $order_data['order']['customer_address'] ?>" autocomplete="off">
+                      <input type="text" class="form-control" id="customer_address" name="customer_address" placeholder="Enter Customer Address" value="<?php echo html_escape($order_data['order']['customer_address']) ?>" autocomplete="off">
                     </div>
                   </div>
 
                   <div class="form-group">
                     <label for="gross_amount" class="col-sm-5 control-label" style="text-align:left;">Customer Phone</label>
                     <div class="col-sm-7">
-                      <input type="text" class="form-control" id="customer_phone" name="customer_phone" placeholder="Enter Customer Phone" value="<?php echo $order_data['order']['customer_phone'] ?>" autocomplete="off">
+                      <input type="text" class="form-control" id="customer_phone" name="customer_phone" placeholder="Enter Customer Phone" value="<?php echo html_escape($order_data['order']['customer_phone']) ?>" autocomplete="off">
                     </div>
                   </div>
                 </div>

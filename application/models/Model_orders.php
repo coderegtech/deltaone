@@ -166,6 +166,15 @@ class Model_orders extends CI_Model
 	public function remove($id)
 	{
 		if($id) {
+			// put the ordered quantities back in stock, as update() does before re-applying items
+			$this->load->model('model_products');
+			foreach ($this->getOrdersItemData($id) as $v) {
+				$product_data = $this->model_products->getProductData($v['product_id']);
+				if ($product_data) {
+					$this->model_products->update(array('qty' => (int) $product_data['qty'] + (int) $v['qty']), $v['product_id']);
+				}
+			}
+
 			$this->db->where('id', $id);
 			$delete = $this->db->delete('orders');
 

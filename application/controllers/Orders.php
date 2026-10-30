@@ -72,9 +72,9 @@ class Orders extends Admin_Controller
 			}
 
 			$result['data'][$key] = array(
-				$value['bill_no'],
-				$value['customer_name'],
-				$value['customer_phone'],
+				html_escape($value['bill_no']),
+				html_escape($value['customer_name']),
+				html_escape($value['customer_phone']),
 				$date_time,
 				$count_total_item,
 				$value['net_amount'],
@@ -353,7 +353,7 @@ class Orders extends Admin_Controller
 			    <div class="row">
 			      <div class="col-xs-12">
 			        <h2 class="page-header">
-			          ' . $company_info['company_name'] . '
+			          ' . html_escape($company_info['company_name']) . '
 			          <small class="pull-right">Date: ' . $order_date . '</small>
 			        </h2>
 			      </div>
@@ -364,10 +364,10 @@ class Orders extends Admin_Controller
 			      
 			      <div class="col-sm-4 invoice-col">
 			        
-			        <b>Bill ID:</b> ' . $order_data['bill_no'] . '<br>
-			        <b>Name:</b> ' . $order_data['customer_name'] . '<br>
-			        <b>Address:</b> ' . $order_data['customer_address'] . ' <br />
-			        <b>Phone:</b> ' . $order_data['customer_phone'] . '
+			        <b>Bill ID:</b> ' . html_escape($order_data['bill_no']) . '<br>
+			        <b>Name:</b> ' . html_escape($order_data['customer_name']) . '<br>
+			        <b>Address:</b> ' . html_escape($order_data['customer_address']) . ' <br />
+			        <b>Phone:</b> ' . html_escape($order_data['customer_phone']) . '
 			      </div>
 			      <!-- /.col -->
 			    </div>
@@ -392,7 +392,7 @@ class Orders extends Admin_Controller
 				$product_data = $this->model_products->getProductData($v['product_id']);
 
 				$html .= '<tr>
-				            <td>' . $product_data['name'] . '</td>
+				            <td>' . html_escape($product_data['name']) . '</td>
 				            <td>' . $v['rate'] . '</td>
 				            <td>' . $v['qty'] . '</td>
 				            <td>' . $v['amount'] . '</td>
