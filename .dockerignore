@@ -1,0 +1,6 @@
+.git
+__MACOSX
+*.eraserdiagram
+node_modules
+application/logs/*
+!application/logs/index.html

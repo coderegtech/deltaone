@@ -1,0 +1,48 @@
+services:
+  db:
+    image: mariadb:10.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS:-codereg}
+      MYSQL_DATABASE: ${DB_NAME:-stock}
+    volumes:
+      - db_data:/var/lib/mysql
+      # imported automatically on first start only
+      - ./stock.sql:/docker-entrypoint-initdb.d/stock.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASS: ${DB_PASS:-codereg}
+      DB_NAME: ${DB_NAME:-stock}
+      BASE_URL: ${BASE_URL:-http://localhost:8080}
+    volumes:
+      - .:/var/www/html
+      - uploads:/var/www/html/uploads
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    profiles: ["tools"]
+    environment:
+      PMA_HOST: db
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+
+volumes:
+  db_data:
+  uploads:

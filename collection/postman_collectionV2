@@ -1,0 +1,154 @@
+{
+	"info": {
+		"_postman_id": "03a41e5f-4d31-4f16-a9c1-94009cddb936",
+		"name": "API Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "36384261",
+		"_collection_link": "https://uptura.postman.co/workspace/Uptura's-Workspace~4e1fc9b6-8ac4-4b44-8881-728ddcf7e9a4/collection/36384261-03a41e5f-4d31-4f16-a9c1-94009cddb936?action=share&source=collection_link&creator=36384261"
+	},
+	"item": [
+		{
+			"name": "activity_log",
+			"item": [
+				{
+					"name": "CREATE",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": "{{base_url}}/api/activity_log/create/"
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": "{{base_url}}/api/activity_log/delete/"
+					},
+					"response": []
+				},
+				{
+					"name": "GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/api/activity_log/get/"
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": "{{base_url}}/api/activity_log/update/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "job_order",
+			"item": [
+				{
+					"name": "CREATE",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": "{{base_url}}/api/job_order/create/"
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": "{{base_url}}/api/job_order/delete/"
+					},
+					"response": []
+				},
+				{
+					"name": "GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/api/job_order/get/"
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"table\": \"job_order\",\r\n  \"where\": {\r\n    \"jo_number\": \"JO-20250814-001\"\r\n  },\r\n  \"data\": {\r\n    \"progress\":\"Completed\"\r\n  }\r\n}\r\n"
+						},
+						"url": "{{base_url}}/api/job_order/update/"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost/FlexiDB",
+			"type": "string"
+		}
+	]
+}
