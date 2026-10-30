@@ -26,8 +26,10 @@ class Admin_Controller extends MY_Controller
 			$this->load->model('model_groups');
 			$group_data = $this->model_groups->getUserGroupByUserId($user_id);
 
-			$this->data['user_permission'] = unserialize($group_data['permission']);
-			$this->permission = unserialize($group_data['permission']);
+			// users without a group (or an empty group) get no permissions instead of a PHP error
+			$permission = $group_data ? unserialize($group_data['permission'], array('allowed_classes' => false)) : array();
+			$this->permission = is_array($permission) ? $permission : array();
+			$this->data['user_permission'] = $this->permission;
 		}
 	}
 
