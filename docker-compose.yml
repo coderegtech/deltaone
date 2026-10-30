@@ -29,6 +29,8 @@ services:
       DB_PASS: ${DB_PASS:-codereg}
       DB_NAME: ${DB_NAME:-stock}
       BASE_URL: ${BASE_URL:-http://localhost:8080}
+      # shared key for the /api endpoints (X-API-Key header); empty disables the API
+      API_KEY: ${API_KEY:-}
     volumes:
       - .:/var/www/html
       - uploads:/var/www/html/uploads

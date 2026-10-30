@@ -26,7 +26,22 @@ function isTableExist($conn, $table, $database)
 }
 
 
-function sanitizeDynamicInput(?array $input): array|false
+// The API reads and writes any table, so every request must carry the shared key
+// configured in the API_KEY environment variable. No key configured = API disabled.
+function requireApiKey()
+{
+    $expected = (string) getenv('API_KEY');
+    $given = isset($_SERVER['HTTP_X_API_KEY']) ? (string) $_SERVER['HTTP_X_API_KEY'] : '';
+    if ($expected === '' || !hash_equals($expected, $given)) {
+        http_response_code(401);
+        header('Content-Type: application/json');
+        jsonResponse(false, "Unauthorized: missing or invalid X-API-Key header.");
+    }
+}
+
+// Returns the sanitized array, or false when the input is invalid.
+// (No union return type: the Docker image runs PHP 7.4.)
+function sanitizeDynamicInput($input)
 {
     if (!is_array($input)) {
         return false;

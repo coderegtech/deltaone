@@ -58,6 +58,7 @@ class DBConnection
 
     public static function setDatabase($dbName)
     {
+        self::env();
         if (!self::databaseExists($dbName)) {
             throw new Exception("Database '$dbName' does not exist.");
         }
@@ -70,6 +71,7 @@ class DBConnection
 
     public static function getConnection()
     {
+        self::env(); // pick up DB_HOST/DB_USER/DB_PASS/DB_NAME (Docker) before the localhost defaults
         if (self::$currentDB === null) {
             self::$currentDB = self::$defaultDB;
         }
