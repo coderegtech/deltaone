@@ -49,9 +49,12 @@ function clean(mysqli $db): void
 {
     $db->query("DELETE oi FROM orders_item oi JOIN orders o ON o.id = oi.order_id WHERE o.bill_no LIKE 'MOCK-%'");
     $db->query("DELETE FROM orders WHERE bill_no LIKE 'MOCK-%'");
-    $db->query("DELETE s FROM work_order_supplies s JOIN work_order w ON w.id = s.work_order_id WHERE w.request_no LIKE 'MOCK-%'");
-    $db->query("DELETE p FROM work_order_performed_by p JOIN work_order w ON w.id = p.work_order_id WHERE w.request_no LIKE 'MOCK-%'");
-    $db->query("DELETE FROM work_order WHERE request_no LIKE 'MOCK-%'");
+    // mock work orders, plus any created through the app for mock users (FKs to users); supplies/performers cascade
+    $mockUsers = "SELECT id FROM users WHERE email LIKE '%@mock.test'";
+    $db->query("DELETE FROM work_order WHERE request_no LIKE 'MOCK-%' OR requested_by IN ($mockUsers) OR checked_by IN ($mockUsers)
+        OR endorsed_by IN ($mockUsers) OR approved_by IN ($mockUsers) OR shift_supervisor_before IN ($mockUsers) OR shift_supervisor_after IN ($mockUsers)");
+    $db->query("DELETE p FROM work_order_performed_by p JOIN users u ON u.id = p.user_id WHERE u.email LIKE '%@mock.test'");
+    $db->query("DELETE s FROM work_order_supplies s JOIN products p ON p.id = s.product_id WHERE p.sku LIKE 'MOCK-%'");
     $db->query("DELETE FROM products WHERE sku LIKE 'MOCK-%'");
     $db->query("DELETE v FROM attribute_value v JOIN attributes a ON a.id = v.attribute_parent_id WHERE a.name LIKE '[MOCK] %'");
     foreach (['attributes', 'brands', 'categories', 'stores'] as $t) {
@@ -117,9 +120,9 @@ $addUser = function ($username, $email, $group) use ($db, $hash, $first, $last, 
     return $id;
 };
 foreach (array_keys($roles) as $key) {
-    $addUser('mock' . $key, "$key@mock.test", $key);
+    $addUser('m' . $key, "$key@mock.test", $key);
 }
-$addUser('mocknogroup', 'nogroup@mock.test', null); // edge case: account without a group
+$addUser('mnogroup', 'nogroup@mock.test', null); // edge case: account without a group
 for ($i = 1; $i <= 25; $i++) {
     $addUser(sprintf('mclerk%02d', $i), sprintf('clerk%02d@mock.test', $i), 'clerk');
 }
@@ -197,7 +200,7 @@ foreach ($years as $year) {
             'vat_charge_rate' => '10', 'vat_charge' => (string) $vat, 'discount' => (string) $discount,
             'net_amount' => (string) round($gross + $service + $vat - $discount, 2),
             'paid_status' => $i % 3 === 0 ? 2 : 1, // 1 = paid, 2 = unpaid
-            'user_id' => $userIds['mockclerk'],
+            'user_id' => $userIds['mclerk'],
         ]);
         foreach ($items as $item) insert($db, 'orders_item', ['order_id' => $oid] + $item);
         $orderCount++;
@@ -230,10 +233,10 @@ foreach ($woStates as $i => list($status, $priority, $outcome, $sig)) {
         'important_usage' => 'Keeps the line running.',
         'consequence_of_inaction' => 'Possible downtime.',
         'safety_concerns' => $priority === 'Emergency' ? 'Live electrical work.' : '',
-        'requested_by' => $userIds['mockrequester'],
-        'checked_by' => $userIds['mockchecker'],
-        'endorsed_by' => $sig['endorser'] ? $userIds['mockapprover'] : null,
-        'approved_by' => $sig['approver'] ? $userIds['mockapprover'] : null,
+        'requested_by' => $userIds['mrequester'],
+        'checked_by' => $userIds['mchecker'],
+        'endorsed_by' => $sig['endorser'] ? $userIds['mapprover'] : null,
+        'approved_by' => $sig['approver'] ? $userIds['mapprover'] : null,
         'work_order_status' => $outcome,
         'status' => $status,
         'closure_notes' => $status === 'Closed' ? 'Closed by mock seed.' : null,
@@ -241,7 +244,7 @@ foreach ($woStates as $i => list($status, $priority, $outcome, $sig)) {
         'signatures' => json_encode($sig),
     ]);
     insert($db, 'work_order_supplies', ['work_order_id' => $woId, 'product_id' => $productIds['NORMAL'], 'quantity' => mt_rand(1, 5)]);
-    if ($done) insert($db, 'work_order_performed_by', ['work_order_id' => $woId, 'user_id' => $userIds['mockchecker']]);
+    if ($done) insert($db, 'work_order_performed_by', ['work_order_id' => $woId, 'user_id' => $userIds['mchecker']]);
 }
 
 // ---- Activity log ----------------------------------------------------------
