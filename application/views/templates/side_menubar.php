@@ -110,7 +110,7 @@
                             <ul class="ml-8 sm:ml-14 mt-2 space-y-1 hidden submenu">
                                 <?php if (in_array('createWorkOrder', $user_permission)): ?>
                                     <li id="addOrderNav">
-                                        <a href="<?php echo base_url('workorder/create') ?>"
+                                        <a href="<?php echo base_url('work_order/create') ?>"
                                             class="flex items-center px-3 sm:px-4 py-2 text-sm text-gray-600 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 nav-item"
                                             data-page="Workorder/create">
                                             <i
@@ -121,7 +121,7 @@
                                 <?php endif; ?>
                                 <?php if (in_array('viewWorkOrder', $user_permission)): ?>
                                     <li id="manageOrderNav">
-                                        <a href="<?php echo base_url('workorder') ?>"
+                                        <a href="<?php echo base_url('work_order') ?>"
                                             class="flex items-center px-3 sm:px-4 py-2 text-sm text-gray-600 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 nav-item"
                                             data-page="Workorder">
                                             <i

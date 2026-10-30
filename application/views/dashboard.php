@@ -197,7 +197,7 @@
                                 <i class="fas fa-tasks text-sm mr-1"></i>
                                 <span class="text-sm font-medium">Pending</span>
                             </div>
-                            <a href="<?php echo base_url('workorder/'); ?>"
+                            <a href="<?php echo base_url('work_order/'); ?>"
                                 class="inline-flex items-center text-sm font-medium text-teal-600 hover:text-teal-700 transition-colors duration-200">
                                 View All
                                 <i class="fas fa-arrow-right ml-1"></i>
@@ -227,7 +227,7 @@
                                 <i class="fas fa-hourglass-half text-sm mr-1"></i>
                                 <span class="text-sm font-medium">Pending</span>
                             </div>
-                            <a href="<?php echo base_url('workorder/'); ?>"
+                            <a href="<?php echo base_url('work_order/'); ?>"
                                 class="inline-flex items-center text-sm font-medium text-rose-600 hover:text-rose-700 transition-colors duration-200">
                                 View All
                                 <i class="fas fa-arrow-right ml-1"></i>
