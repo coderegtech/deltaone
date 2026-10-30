@@ -66,12 +66,45 @@ Baseline failures (each now passes):
 - **Security (14)**: RBAC redirects for 8 admin pages, product delete / attribute values / work-order store permission checks, settings privilege escalation, PHP upload, path traversal, valid upload + stored path, invoice XSS, product-list XSS, sensitive files 403, API 401 without key (GET row/column endpoints + POST create), API 200 with key.
 - **Workflows (7)**: brand/category/store create → validation error → update → viewer blocked → delete; user create (short password, duplicate) → edit → delete; order create → stock deducted → update → stock re-applied + paid status → delete → stock restored; product stock-status labels; activity log date filter and bad page param.
 
+## Playwright UI end-to-end suite (`e2e/`)
+
+Real Chromium (Playwright 1.64.1) driving the actual forms, modals, DataTables and JS, with DB assertions. Every test also fails on any uncaught JS error or PHP/DB error page (fixture in `e2e/fixtures.mjs`; the only allow-listed error is the documented Company-page Summernote one).
+
+```bash
+npm install
+```
+```bash
+npx playwright install chromium
+```
+```bash
+npx playwright test
+```
+```bash
+npx playwright show-report
+```
+
+`npm run test:e2e:headed` shows the browser while it runs. Re-seed the mock data first.
+
+**Result: 35/35 passed** (29 desktop + 6 mobile, ≈7 min; screenshot per test in the HTML report).
+
+| Spec | Tests |
+|---|---|
+| `auth` | native required-field check; unknown email / wrong password messages; login → dashboard → logout → protected page bounces; group-less account |
+| `navigation` | every sidebar/header link returns 200 with no error page; viewer redirected from 5 admin pages |
+| `master-data` | brands, categories, stores, attributes: empty-name validation, add, edit (name + status), delete via the modals; attribute values add/edit/delete |
+| `users-groups` | user create (short-password error, then success), prefilled edit, the new account logs in, delete via modal (no orphan group row); group create with permissions, edit (toggle permissions), delete; profile + settings update |
+| `products` | create with image, brand, category → listed with "Low!" and a loading thumbnail → edit stock → delete; client validation alert; Out-of-stock / Over-supply labels; XSS name shown as text; low-stock page; clerk blocked |
+| `orders-reports` | order create with live rate/amount/gross/net calculation and stock deduction → update qty + paid status → printable invoice popup; order list; reports year switch + chart; company save persists; activity-log filter; dashboard cards |
+| `work-orders` | requester submits Emergency request with supply (searched product, qty) and photo → stored with supply + file, listed, requester can't edit; missing project type rejected; checker opens edit page; **expected failure** documenting that saving the edit/approval form 404s |
+| `responsive` (Pixel 7) | no horizontal overflow on login, dashboard, products, users, work-order create, reports |
+
+Bugs Playwright found that the HTTP suite could not (all fixed, see BUG_FIXES.md #17–#22): `jQuery is not defined` on every page, scanner.js 404/camera on every page, work-order form broken by quotes/newlines in product data (+ DOM XSS), product update notices when no new image is chosen, product edit page broken for products without attributes, case-sensitive `workorder` links.
+
 ## Manual / browser checks (built-in browser)
 
 - Logged in as `superadmin@mock.test` through the real form → dashboard renders with work-order cards.
 - `/users/edit/{id}`: form posts to `users/edit/{id}`, username/email prefilled, current group selected.
 - 375 px mobile viewport on `/products`: no horizontal page overflow; table is inside a scroll wrapper.
-- Console: only external 404 is `cdn.jsdelivr.net/npm/@zxing/library@0.19.1` (scanner library URL, see remaining issues).
 - At ~800 px wide the sidebar is open and overlaps the content (cosmetic, not fixed).
 
 ## Builds / startup
@@ -83,7 +116,8 @@ Baseline failures (each now passes):
 ## Not tested / blocked
 
 - No existing automated tests in the repo to re-run (none were present).
-- Playwright MCP server failed to connect, so no scripted browser E2E; HTTP-level tests + manual browser checks used instead. JavaScript-driven flows (order form total calculation, work-order multi-step signing UI, barcode scanner) were not exercised by automation.
+- The barcode scanner (no page renders it) and the work-order multi-step signing UI (its save endpoint does not exist) are not exercised.
+- The host machine was at ~0.2 GB free RAM during the runs; Chromium crashed once with `VirtualAlloc failed` until a stale test process was stopped. Runs are slow (≈1 s per request through the Windows bind mount).
 - Work-order approval/edit submission: the edit view posts to `workorder/update`, which does not exist in `WorkOrder` (see remaining issues) — not testable as a working flow.
 - XAMPP / subdirectory install (`http://localhost/deltaone`) not run; `.htaccess` rules were written to be path-relative.
 - Load/performance testing not performed beyond the 310-product / 60-order dataset.
