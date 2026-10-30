@@ -1,4 +1,11 @@
+# Credentials, DB dumps, docs and tooling files live in the web root; never serve them.
+<FilesMatch "\.(sql|txt|md|json|lock|yml|yaml|eraserdiagram)$|^(Dockerfile|\.dockerignore|\.gitignore|\.gitattributes)$">
+    Require all denied
+</FilesMatch>
+
 RewriteEngine on
+# Uploaded files are data, never code (Docker mounts a volume over uploads/, so this lives here).
+RewriteRule ^(uploads|assets/images)/.*\.(php[0-9]?|phtml|phar|pht)$ - [F,NC]
 RewriteCond $1 !^(index\.php|resources|robots\.txt)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
