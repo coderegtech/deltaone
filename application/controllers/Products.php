@@ -264,7 +264,7 @@ class Products extends Admin_Controller
                 'high_quantity' => $this->input->post('high_quantity'),
             );
 
-            if ($_FILES['product_image']['size'] > 0) {
+            if (!empty($_FILES['product_image']['size'])) { // no new image chosen = keep the current one
                 $upload_image = $this->upload_image();
                 $upload_image = array('image' => $upload_image);
 
@@ -363,7 +363,7 @@ class Products extends Admin_Controller
                 'high_quantity' => $this->input->post('high_quantity'),
             );
 
-            if ($_FILES['product_image']['size'] > 0) {
+            if (!empty($_FILES['product_image']['size'])) { // no new image chosen = keep the current one
                 $upload_image = $this->upload_image();
                 $upload_image = array('image' => $upload_image);
 
