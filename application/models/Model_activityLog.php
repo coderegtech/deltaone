@@ -31,6 +31,11 @@ class Model_activityLog extends CI_Model
 
     public function get_logs_paginated($limit = 10, $offset = 0, $filters = [])
     {
+        // a bare end date ('2025-08-18') means "through the end of that day", not midnight
+        if (!empty($filters['end_date']) && strlen($filters['end_date']) === 10) {
+            $filters['end_date'] .= ' 23:59:59';
+        }
+
         // ✅ Apply filters: user_name, action_type
         if (!empty($filters['user_name'])) {
             $this->db->where('user_name', $filters['user_name']);

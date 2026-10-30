@@ -25,7 +25,7 @@ class ActivityLog extends Admin_Controller
 
         $data['user_permission'] = $this->permission;
 
-        $page     = $this->input->get('page') ?? 1;
+        $page     = max(1, (int) $this->input->get('page'));
         $per_page = 15;
         $offset   = ($page - 1) * $per_page;
 
