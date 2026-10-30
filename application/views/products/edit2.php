@@ -212,7 +212,7 @@
                             <!-- Brands -->
                             <div class="space-y-3">
                                 <label for="brands" class="block text-sm font-semibold text-slate-700">Brands</label>
-                                <?php $brand_data = json_decode($product_data['brand_id']); ?>
+                                <?php $brand_data = (array) json_decode($product_data['brand_id']); ?>
                                 <select
                                     class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
                                     id="brands" name="brands[]" multiple>
@@ -228,7 +228,7 @@
                             <div class="space-y-3">
                                 <label for="category"
                                     class="block text-sm font-semibold text-slate-700">Categories</label>
-                                <?php $category_data = json_decode($product_data['category_id']); ?>
+                                <?php $category_data = (array) json_decode($product_data['category_id']); ?>
                                 <select
                                     class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
                                     id="category" name="category[]" multiple>
@@ -242,7 +242,7 @@
                         </div>
 
                         <!-- Attributes -->
-                        <?php $attribute_id = json_decode($product_data['attribute_value_id']); ?>
+                        <?php $attribute_id = (array) json_decode($product_data['attribute_value_id']); ?>
                         <?php if ($attributes): ?>
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 <?php foreach ($attributes as $k => $v): ?>
