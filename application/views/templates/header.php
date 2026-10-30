@@ -126,10 +126,7 @@
             color: #f3f4f6;
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-
-
-    <!-- jQuery 3 -->
+    <!-- jQuery 3 (select2 is loaded once, after jQuery, further down) -->
     <script src="<?php echo base_url('assets/bower_components/jquery/dist/jquery.min.js') ?>"></script>
     <!-- jQuery UI 1.11.4 -->
     <script src="<?php echo base_url('assets/bower_components/jquery-ui/jquery-ui.min.js') ?>"></script>
@@ -146,8 +143,7 @@
     <script src="<?php echo base_url('assets/bower_components/jquery-sparkline/dist/jquery.sparkline.min.js') ?>">
     </script>
     <!-- barcode--->
-    <script type="module" src="assets/dist/js/scanner.js"></script>
-    </script>
+    <script type="module" src="<?php echo base_url('assets/dist/js/scanner.js') ?>"></script>
     <!-- jvectormap -->
     <script src="<?php echo base_url('assets/plugins/jvectormap/jquery-jvectormap-1.2.2.min.js') ?>"></script>
     <script src="<?php echo base_url('assets/plugins/jvectormap/jquery-jvectormap-world-mill-en.js') ?>"></script>
