@@ -131,6 +131,11 @@ class WorkOrder extends Admin_Controller
 
     public function store()
     {
+        if (!in_array('createWorkOrder', $this->permission)) {
+            echo json_encode(['success' => false, 'errors' => ["You don't have permission to create work orders."]]);
+            return;
+        }
+
         $this->load->model('Model_workorder');
         $this->load->model('Model_products');
         $this->load->model('Model_users');
@@ -159,7 +164,9 @@ class WorkOrder extends Admin_Controller
         if (empty($request_no)) {
             $request_no = $this->Model_workorder->generate_request_no();
         }
-        if (empty($request_date)) $errors[] = "Request Date is required.";
+        // request_no becomes a directory name below, so keep it to the generated format's characters
+        if (!preg_match('/^[A-Za-z0-9-]{1,50}$/', $request_no)) $errors[] = "Invalid Request No.";
+        if (empty($request_date) || !DateTime::createFromFormat('Y-m-d', $request_date)) $errors[] = "Request Date is required (YYYY-MM-DD).";
         if (empty($request_time)) $errors[] = "Request Time is required.";
         if (!in_array($priority_mode, ['Emergency', 'Normal'])) $errors[] = "Invalid Priority Mode.";
         if (empty($request_title) || strlen($request_title) > 200) $errors[] = "Request Title is required and max 200 chars.";
@@ -208,29 +215,36 @@ class WorkOrder extends Admin_Controller
 
         // Validate attachments 
         $uploaded_files = [];
+        $accepted = [];
         if (!empty($_FILES['attachments']['name'][0])) {
-            $allowed_types = ['image/jpeg', 'image/png', 'image/jpg'];
             if (count($_FILES['attachments']['name']) > 5) {
-                $errors[] = "Maximum 3 attachments allowed.";
+                $errors[] = "Maximum 5 attachments allowed.";
             } else {
-                $upload_path = FCPATH . "uploads/work_orders/{$request_no}/";
-                if (!is_dir($upload_path)) mkdir($upload_path, 0777, true);
-
+                // trust neither the client MIME type nor the name: check extension AND real image content
+                $image_types = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png'];
                 for ($i = 0; $i < count($_FILES['attachments']['name']); $i++) {
-                    if ($_FILES['attachments']['error'][$i] == 0) {
-                        if (!in_array($_FILES['attachments']['type'][$i], $allowed_types)) {
-                            $errors[] = "Invalid file type for attachment #" . ($i + 1);
-                            continue;
-                        }
-                        $filename = time() . '_' . basename($_FILES['attachments']['name'][$i]);
-                        $filepath = $upload_path . $filename;
-
-                        if (move_uploaded_file($_FILES['attachments']['tmp_name'][$i], $filepath)) {
-                            $uploaded_files[] = 'uploads/work_orders/' . $filename;
-                        } else {
-                            $errors[] = "Failed to upload attachment #" . ($i + 1);
-                        }
+                    if ($_FILES['attachments']['error'][$i] != 0) continue;
+                    $ext = strtolower(pathinfo($_FILES['attachments']['name'][$i], PATHINFO_EXTENSION));
+                    $info = @getimagesize($_FILES['attachments']['tmp_name'][$i]);
+                    if (!in_array($ext, ['jpg', 'jpeg', 'png']) || !$info || !isset($image_types[$info[2]])) {
+                        $errors[] = "Invalid file type for attachment #" . ($i + 1) . " (JPG or PNG only).";
+                        continue;
                     }
+                    $accepted[$i] = $image_types[$info[2]];
+                }
+            }
+        }
+
+        // move files only once everything is valid, so rejected requests leave nothing behind
+        if (empty($errors) && $accepted) {
+            $relative_dir = "uploads/work_orders/{$request_no}/";
+            if (!is_dir(FCPATH . $relative_dir)) mkdir(FCPATH . $relative_dir, 0755, true);
+            foreach ($accepted as $i => $ext) {
+                $filename = time() . "_{$i}." . $ext;
+                if (move_uploaded_file($_FILES['attachments']['tmp_name'][$i], FCPATH . $relative_dir . $filename)) {
+                    $uploaded_files[] = $relative_dir . $filename;
+                } else {
+                    $errors[] = "Failed to upload attachment #" . ($i + 1);
                 }
             }
         }

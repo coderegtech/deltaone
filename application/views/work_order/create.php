@@ -75,13 +75,13 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-4">
                     <div>
                         <label class="block text-gray-700 py-2">Request Date</label>
-                        <input type="date" required name="request_date" value="<?php echo date('d/m/y'); ?>"
+                        <input type="date" required name="request_date" value="<?php echo date('Y-m-d'); ?>"
                             class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
                             data-permission="requester">
                     </div>
                     <div>
                         <label class="block text-gray-700 py-2">Request Time</label>
-                        <input type="time" required name="request_time" value="<?php echo date('h:i A'); ?>"
+                        <input type="time" required name="request_time" value="<?php echo date('H:i'); ?>"
                             class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
                             data-permission="requester">
                     </div>
