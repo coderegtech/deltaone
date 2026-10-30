@@ -1,92 +1,136 @@
-<p><a target="_blank" href="https://app.eraser.io/workspace/m5slGlRfBf7Xmi5HwElp" id="edit-in-eraser-github-link"><img alt="Edit in Eraser" src="https://firebasestorage.googleapis.com/v0/b/second-petal-295822.appspot.com/o/images%2Fgithub%2FOpen%20in%20Eraser.svg?alt=media&amp;token=968381c8-a7e7-472a-8ed6-4a6626da5501"></a></p>
+# DeltaOne — Asset & Inventory Management System
 
-# Inventory System
-Create an Inventory System using CodeIgniter, MySQL & PHP
+Inventory, work-order and user/role management for a power-plant maintenance team, built on CodeIgniter 3, PHP and MySQL/MariaDB.
 
-# Screenshots
-![Login Page](https://github.com/ronknight/InventorySystem/blob/master/assets/images/screenshots/login.PNG "")
+![Dashboard](docs/screenshots/dashboard.png)
 
-![Dashboard](https://github.com/ronknight/InventorySystem/blob/master/assets/images/screenshots/dashboard.PNG "")
+## Screenshots
 
-![Database](https://github.com/ronknight/InventorySystem/blob/master/assets/images/screenshots/database.PNG "")
+| | |
+|---|---|
+| ![Login](docs/screenshots/login.png) **Login** | ![Work orders](docs/screenshots/work-orders.png) **Work orders** — status counters, search, status filter |
+| ![Work request form](docs/screenshots/work-order-create.png) **New work request** — priority, project type, supplies, photos | ![Products](docs/screenshots/products.png) **Inventory** — stock status, store, availability |
+| ![Add item](docs/screenshots/product-create.png) **Add item** — image, part/item number, thresholds, brand, category, attributes | ![Low stock](docs/screenshots/low-stock.png) **Low stock** — items at or below their threshold |
+| ![Users](docs/screenshots/users.png) **Users** | ![Groups](docs/screenshots/groups.png) **Groups (roles)** |
+| ![Reports](docs/screenshots/reports.png) **Reports** — monthly sales by year | ![Activity log](docs/screenshots/activity-log.png) **Activity log** — filter by date, user, action |
 
-# System Features
-1. Manage Users
-- Add new user detail
-- View, Update, and remove user information
-1. Manage Groups
-- Add new group information
-- View, Update, and remove group information
-1. Manage Brands
-- Add new brand data
-- View, Update, and remove brand information
-1. Manage Category
-- Add new category information
-- View, Update, and remove category information
-1. Manage Stores
-- Add new store information
-- View, Update, and remove stores information
-1. Manage Attributes
-- Add new attribute information
-- View, Update, and remove attributes information
-1. Manage Products
-- Add new product information
-- View, Update, and remove products information
-1. Manage Orders
-- Add new order information
-- View, Update, and remove orders information
-1. Reports
-- View total amount of sales represented on the graphical chart based on yearly.
-1. Company
-- Update the company information
-- That includes company name, address, phone, message, vat charge, service charge and more..
-1. Profile
-- View the logged in user information
-1. Setting
-- View, and Update logged in user information
-# Super Admin Credential
-email: [﻿admin@admin.com](mailto:admin@admin.com)
-password: password
+<img src="docs/screenshots/mobile-dashboard.png" alt="Dashboard on a phone" width="260"> **Responsive** — phone layout
 
-database name: stock
+Screenshots show mock data (see [Mock data](#mock-data)); regenerate them with `node scripts/screenshots.mjs`.
 
-# Server Requirements
-PHP version 5.6 or newer is recommended.
+## Features
 
+- **Inventory** — items with image, part and item number, price, quantity, low/high stock thresholds, store (rack location), brands, categories and attributes; low-stock page; "Low", "Out of stock" and "Over supply" flags.
+- **Work orders** — request → approval → work order → status → closed; Emergency/Normal priority; improvement/safety/corrective/preventive types; supplies drawn from inventory; photo attachments; requester, checker, endorser, receiver, supervisor and approver roles.
+- **Master data** — brands, categories, stores (rack locations), attributes and attribute values.
+- **Users and groups** — role-based permissions per group (`viewProduct`, `createWorkOrder`, …), profile and personal settings.
+- **Orders and reports** — orders with service charge/VAT, printable invoice, yearly sales chart. (Orders are currently hidden from the menu; see [remaining issues](docs/REMAINING_ISSUES.md).)
+- **Company settings** — name, address, currency, charges.
+- **Activity log** — logins, creates, updates and deletes, with filters.
+- **Job-order API** — JSON endpoints under `api/` for an external job-order system, protected by an API key.
+
+## Tech stack
+
+| Layer | |
+|---|---|
+| Backend | CodeIgniter 3, PHP 7.4 (CodeIgniter 3 does not run on PHP 8) |
+| Database | MariaDB 10.4 / MySQL — schema and seed data in `stock.sql` |
+| Frontend | Server-rendered views, Tailwind CSS, jQuery, DataTables, Select2, Chart.js |
+| Tooling | Docker Compose, Node 18+ for tests (`node:test`, Playwright) |
+
+## Quick start (Docker)
+
+```bash
+API_KEY=change-me docker compose up -d --build
 ```
-It should work on 5.3.7 as well, but we strongly advise you NOT to run
-such old versions of PHP, because of potential security and performance
-issues, as well as missing features.
-```
-Application Server
 
+Open <http://localhost:8080>. The database is created from `stock.sql` on the first start.
+
+The `stock.sql` seed includes an administrator account `admin@admin.com` with the password `password`. **Change it right after the first login**, and do not use the seed data in production.
+
+Environment variables (set them in your shell or a `.env` file next to `docker-compose.yml`):
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `WEB_PORT` | `8080` | Host port for the app |
+| `BASE_URL` | `http://localhost:8080` | CodeIgniter base URL |
+| `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME` | `db`, `root`, compose default, `stock` | Database connection |
+| `API_KEY` | *(empty)* | Shared key for the `api/` endpoints; empty disables the API |
+
+phpMyAdmin is available on port 8081 with:
+
+```bash
+docker compose --profile tools up -d
 ```
-You can choose to install any of the following Application Server: LAMP, MAMP, XAMMP.
+
+### Upgrading an existing database
+
+Databases created from an older `stock.sql` are missing three columns the code uses (`products.part_number`, `products.high_quantity`, `work_order.signatures`); without them the dashboard fails with *Unknown column 'high_quantity'*. The migration only adds columns and is safe to run more than once:
+
+```bash
+docker exec -i deltaone-db-1 sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" stock' < database/migrations/2026_10_30_add_missing_columns.sql
 ```
-# Installation
-1. Clone or download files. Add them to your Root folder if you are using XAMMP the location is "C:\xampp\htdocs\InventorySystem".
-2. Open PhpMyAdmin from your local Application Server.
-3. Create new database and name it as "stock"
-4. Import stock.sql to your stock database.
-5. Turn On Apache and MySQL on your Application Server Control Panel.
-6. Your system show be found on [﻿http://localhost/InventorySystem/](http://localhost/InventorySystem/) 
-# License
+
+## Installation without Docker (XAMPP / LAMP)
+
+1. Copy the project into your web root, e.g. `C:\xampp\htdocs\deltaone`.
+2. In phpMyAdmin create a database named `stock` and import `stock.sql` (and run the migration above if the database already existed).
+3. Set the database password in `application/config/database.php` or via the `DB_*` environment variables, and `BASE_URL` if the folder name differs (default `http://localhost/deltaone`).
+4. Start Apache and MySQL and open <http://localhost/deltaone>.
+
+Use PHP 7.4, with `mod_rewrite` and `AllowOverride All` enabled for the `.htaccess` rules.
+
+## Mock data
+
+A seeder creates clearly marked test data: one account per role, 310 products in every stock state, orders across three years, work orders in every status and activity-log entries. It refuses to run without `MOCK_SEED=1` and re-runs only replace rows it created:
+
+```bash
+docker exec -e MOCK_SEED=1 deltaone-web-1 php database/seeds/seed_mock_data.php
+```
+
+All mock accounts use the password `MockPass123!` (for example `superadmin@mock.test`, `requester@mock.test`, `viewer@mock.test`). Details and the full account list: [docs/MOCK_DATA.md](docs/MOCK_DATA.md).
+
+## Tests
+
+Both suites run against a seeded Docker stack; [docs/TEST_REPORT.md](docs/TEST_REPORT.md) explains the isolated test stack they expect (`docker compose -p deltaone-review`, port 8091).
+
+```bash
+npm install
+```
+
+HTTP integration tests (48 — auth, every page, permissions, security, business workflows):
+
+```bash
+npm run test:http
+```
+
+Playwright UI end-to-end tests (35 — real Chromium, desktop and mobile):
+
+```bash
+npx playwright install chromium
+```
+
+```bash
+npm run test:e2e
+```
+
+## Job-order API
+
+`api/job_order/{create,get,update,delete}/`, `api/db-rows/…` and `api/manage-column/…` accept JSON and require the header `X-API-Key: <API_KEY>`. Payloads and a Postman collection are in [collection/](collection/README.md).
+
+## Documentation
+
+- [Project review](docs/PROJECT_REVIEW.md) — architecture, modules, findings
+- [Bug fixes](docs/BUG_FIXES.md) — what was fixed and why
+- [Test report](docs/TEST_REPORT.md) — suites, results, coverage
+- [Mock data](docs/MOCK_DATA.md) — seeder and test accounts
+- [Remaining issues](docs/REMAINING_ISSUES.md) — known problems and recommendations
+- Architecture and process-flow diagrams: `README-Inventory System Architecture-1.eraserdiagram`, `README-Inventory System Process Flow-2.eraserdiagram` ([Eraser workspace](https://app.eraser.io/workspace/m5slGlRfBf7Xmi5HwElp))
+
+## Credits
+
+Based on the open-source Stock Management System v2 by [CodersFolder](https://codersfolder.com/2018/02/stock-management-system-v2-codeigniter/), built with [CodeIgniter](https://codeigniter.com/) and [AdminLTE](https://adminlte.io/).
+
+## License
+
 MIT
-
-# Resources
-Original Sourcecode from CodeFolder - [﻿https://codersfolder.com/2018/02/stock-management-system-v2-codeigniter/](https://codersfolder.com/2018/02/stock-management-system-v2-codeigniter/)
-CodeIgniter - Web Framework
-AdminLTE - Theme
-
-# Acknowledgement
-Great Project
-
-
-<!-- eraser-additional-content -->
-## Diagrams
-<!-- eraser-additional-files -->
-<a href="/README-Inventory System Architecture-1.eraserdiagram" data-element-id="AbcPsRGDY-UhIUl_iSekL"><img src="/.eraser/m5slGlRfBf7Xmi5HwElp___3Jivg2tjMecMlrHwbIVIBR8f7U03___---diagram----183155d7d2295f14751da1849205be06-Inventory-System-Architecture.png" alt="" data-element-id="AbcPsRGDY-UhIUl_iSekL" /></a>
-<a href="/README-Inventory System Process Flow-2.eraserdiagram" data-element-id="6wk2ZJlDbVDMNHFUYGpnA"><img src="/.eraser/m5slGlRfBf7Xmi5HwElp___3Jivg2tjMecMlrHwbIVIBR8f7U03___---diagram----403eabcbfe259f79a6f1d3bdc45a37fa-Inventory-System-Process-Flow.png" alt="" data-element-id="6wk2ZJlDbVDMNHFUYGpnA" /></a>
-<!-- end-eraser-additional-files -->
-<!-- end-eraser-additional-content -->
-<!--- Eraser file: https://app.eraser.io/workspace/m5slGlRfBf7Xmi5HwElp --->

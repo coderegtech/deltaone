@@ -22,7 +22,7 @@ Ordered by priority. None of these were changed on this branch, either because t
 13. **Docker `uploads` volume** shadows the repo's `uploads/` (and its `.htaccess`); the root `.htaccess` rule covers it, but keep that rule if the layout changes.
 
 13a. **Work-order delete links 404.** The work-order list and dashboard cards link to `work_order/delete/{id}`, but `WorkOrder` has no `delete()` method.
-13b. **Orders are hidden from the UI.** There is no Orders entry in the sidebar, and the action buttons in `Orders::fetchOrdersData` (print/edit/delete) are commented out, so orders can only be reached by URL. Confirm whether this is intentional.
+13b. **Orders are hidden from the UI.** There is no Orders entry in the sidebar, and the action buttons in `Orders::fetchOrdersData` (print/edit/delete) are commented out, so orders can only be reached by URL. The order create/edit pages also render unstyled: they use Bootstrap 3 markup but the layout no longer loads Bootstrap's CSS. Confirm whether the module is meant to be retired or restyle it.
 13c. **Company page JS**: it initialises a Summernote editor that is not shipped, so the page throws `summernote is not a function`. Saving still works only because that error stops the AJAX submit handler from attaching (the controller returns a redirect, not the JSON that handler expects). Either add Summernote and make the controller answer JSON, or delete the dead handler.
 13d. **Work-order form client validation**: missing required fields show a toast but do not stop submission (`isValid` is never set in that loop); the server rejects only a missing title/date.
 13e. **Product create/update accept non-numeric or negative price/qty** (`required` only, no `numeric`/`greater_than_equal_to` rules).
@@ -31,7 +31,7 @@ Ordered by priority. None of these were changed on this branch, either because t
 ## Low
 
 14. N+1 queries: dashboard and work-order list call `user_exists()` + `getUserData()` per user field per order; product feeds call `getStoresData()` per row; invoice calls `getProductData()` per item. Fine at current volume (310 products), worth joins later.
-15. Responsive: at ~800 px the sidebar is open and overlays content.
+15. Responsive: at ~800 px the sidebar is open and overlays content. On the Reports page the chart is wider than its card at 1440 px, clipping the last months.
 16. *(fixed: the scanner script no longer runs on pages without a scanner.)* No page currently renders the barcode scanner (`<video id="video">`); wire it into a page or remove `scanner.js`.
 16a. Work-order list/dashboard echo `request_title`/`request_no` unescaped (part of #7).
 17. Dead code: `LowQuantityController.php` (declares a second `LowIndex` class, unreachable), empty `lowproduct.php`, `controllers/dpi.png`, `__MACOSX/`, `test/`, empty `ActivityLog::create/update/remove`, large commented blocks, ~20-line activity-log boilerplate duplicated in most actions (candidate for a helper in `Admin_Controller`).
