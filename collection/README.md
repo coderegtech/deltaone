@@ -45,6 +45,10 @@ Please edit
 {{base_url}} = http://localhost/Your-Folder-Location
 ```
 
+### **Authentication**
+Every request must send the header `X-API-Key: <key>`, where `<key>` matches the server's `API_KEY`
+environment variable. Without a configured key the API answers `401` to everything.
+
 ---
 
 ### **1. Job Order Endpoints**
