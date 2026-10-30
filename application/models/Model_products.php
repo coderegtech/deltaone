@@ -94,7 +94,7 @@ class Model_products extends CI_Model
     // Fetch high quantity products
     public function getHighQuantityProducts()
     {
-        $this->db->where('CAST(qty AS UNSIGNED) > CAST(high_quantity AS UNSIGNED)'); // Example condition for high quantity
+        $this->db->where('high_quantity > 0 AND CAST(qty AS UNSIGNED) > high_quantity'); // 0 = no upper limit set
         $query = $this->db->get('products');
         return $query->result_array();
     }
@@ -102,7 +102,7 @@ class Model_products extends CI_Model
     // Count high quantity products
     public function countHighQuantityProducts()
     {
-        $this->db->where('CAST(qty AS UNSIGNED) > CAST(high_quantity AS UNSIGNED)'); // Example condition for high quantity
+        $this->db->where('high_quantity > 0 AND CAST(qty AS UNSIGNED) > high_quantity'); // 0 = no upper limit set
         $query = $this->db->get('products');
         return $query->num_rows();
     }

@@ -40,14 +40,14 @@ class Products extends Admin_Controller
             $buttons = '';
 
 
-            $img = '<img src="' . base_url($value['image']) . '" alt="' . $value['name'] . '" class="img-circle" width="50" height="50" />';
+            $img = '<img src="' . html_escape(base_url($value['image'])) . '" alt="' . html_escape($value['name']) . '" class="img-circle" width="50" height="50" />';
 
             $availability = ($value['availability'] == 1)
                 ? '<span class="inline-flex items-center px-3 py-1 text-sm font-semibold text-green-800 bg-green-100/80 rounded-full">Active</span>'
                 : '<span class="inline-flex items-center px-3 py-1 text-sm font-semibold text-yellow-800 bg-yellow-100/80 rounded-full">Inactive</span>';
 
             $qty_status = '';
-            if ($value['qty'] > $value['high_quantity']) {
+            if ($value['high_quantity'] > 0 && $value['qty'] > $value['high_quantity']) {
                 $qty_status = '<span class="inline-block px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded">Over supply!</span>';
                 $name_style = 'text-red-600';
             } else {
@@ -56,8 +56,8 @@ class Products extends Admin_Controller
 
             $result['data'][$key] = array(
                 $img,
-                '<span class="' . $name_style . '">' . $value['name'] . '</span>',
-                $value['sku'],
+                '<span class="' . $name_style . '">' . html_escape($value['name']) . '</span>',
+                html_escape($value['sku']),
                 $value['price'],
                 $value['qty'] . ' ' . $qty_status,
                 $store_data['name'],
@@ -83,20 +83,20 @@ class Products extends Admin_Controller
             $buttons = '';
 
 
-            $img = '<img src="' . base_url($value['image']) . '" alt="' . $value['name'] . '" class="img-circle" width="50" height="50" />';
+            $img = '<img src="' . html_escape(base_url($value['image'])) . '" alt="' . html_escape($value['name']) . '" class="img-circle" width="50" height="50" />';
 
             $availability = ($value['availability'] == 1)
                 ? '<span class="inline-flex items-center px-3 py-1 text-sm font-semibold text-green-800 bg-green-100/80 rounded-full">Active</span>'
                 : '<span class="inline-flex items-center px-3 py-1 text-sm font-semibold text-yellow-800 bg-yellow-100/80 rounded-full">Inactive</span>';
 
             $qty_status = '';
-            if ($value['qty'] <= $value['low_quantity']) {
-                $qty_status = '<span class="inline-block px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded">Low!</span>';
-                $name_style = 'text-red-600';
-            } elseif ($value['qty'] <= 0) {
+            if ($value['qty'] <= 0) {
                 $qty_status = '<span class="inline-block px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded">Out of stock!</span>';
                 $name_style = 'text-red-600';
-            } elseif ($value['qty'] > $value['high_quantity']) {
+            } elseif ($value['qty'] <= $value['low_quantity']) {
+                $qty_status = '<span class="inline-block px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded">Low!</span>';
+                $name_style = 'text-red-600';
+            } elseif ($value['high_quantity'] > 0 && $value['qty'] > $value['high_quantity']) {
                 $qty_status = '<span class="inline-block px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded">Over supply!</span>';
                 $name_style = 'text-red-600';
             } else {
@@ -105,8 +105,8 @@ class Products extends Admin_Controller
 
             $result['data'][$key] = array(
                 $img,
-                '<span class="' . $name_style . '">' . $value['name'] . '</span>',
-                $value['sku'],
+                '<span class="' . $name_style . '">' . html_escape($value['name']) . '</span>',
+                html_escape($value['sku']),
                 $value['price'],
                 $value['qty'] . ' ' . $qty_status,
                 $store_data['name'],
@@ -429,6 +429,11 @@ class Products extends Admin_Controller
 
     public function remove()
     {
+        if (!in_array('deleteProduct', $this->permission)) {
+            echo json_encode(['success' => false, 'messages' => "You don't have permission to delete products."]);
+            return;
+        }
+
         $product_id = $this->input->post('product_id');
 
         if (empty($product_id)) {
@@ -449,7 +454,7 @@ class Products extends Admin_Controller
             if ($user_name) {
                 $log_data = [
                     'user_name'    => $user_name,
-                    'action_type'  => 'Update',
+                    'action_type'  => 'Delete',
                     'description'  => "Delete Product: [{$product_id}]"
                     // log_time auto-filled
                 ];
