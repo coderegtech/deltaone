@@ -84,6 +84,7 @@ class Model_users extends CI_Model
 	{
 		$this->db->where('id', $id);
 		$delete = $this->db->delete('users');
+		$this->db->where('user_id', $id)->delete('user_group');
 		return ($delete == true) ? true : false;
 	}
 

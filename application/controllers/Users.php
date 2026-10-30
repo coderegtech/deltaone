@@ -353,7 +353,8 @@ class Users extends Admin_Controller
 							'gender' => $this->input->post('gender'),
 						);
 
-						$update = $this->model_users->edit($data, $id, $this->input->post('groups'));
+						// never take a group from this form: users must not be able to change their own role
+						$update = $this->model_users->edit($data, $id);
 						if ($update == true) {
 							$this->session->set_flashdata('success', 'Successfully updated');
 							redirect('users/setting/', 'refresh');
