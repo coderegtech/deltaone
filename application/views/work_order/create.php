@@ -497,7 +497,7 @@
 
                             setTimeout(() => {
                                 window.location.href =
-                                    "<?php echo base_url('workorder/'); ?>"; // ← your target page
+                                    "<?php echo base_url('work_order/'); ?>"; // ← your target page
                             }, 3000);
                         } else {
                             showErrorToast("Submission failed. Try again later.");
@@ -510,17 +510,17 @@
         });
 
 
-        const products = [
-            <?php foreach ($products as $product): ?> {
-                    id: "<?= $product['id'] ?>",
-                    name: "<?= $product['name'] ?>",
-                    sku: "<?= $product['sku'] ?>",
-                    store: "<?= $product['store'] ?>",
-                    description: "<?= $product['description'] ?>",
-                    qty: <?= $product['qty'] ?>
-                },
-            <?php endforeach; ?>
-        ];
+        // json_encode: quotes or newlines in product data must not break (or inject into) this script
+        const products = <?php echo json_encode(array_map(function ($product) {
+            return [
+                'id' => (string) $product['id'],
+                'name' => $product['name'],
+                'sku' => $product['sku'],
+                'store' => $product['store'],
+                'description' => $product['description'],
+                'qty' => (int) $product['qty'],
+            ];
+        }, $products), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
         // console.log(products);
 
         const searchInput = document.getElementById('product-search');
@@ -567,6 +567,12 @@
             let maxQty = this.options[this.selectedIndex].getAttribute('data-qty');
             // console.log(maxQty);
             if (itemId) {
+                // product data is user-entered; escape it before it goes into innerHTML
+                const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+                itemSku = esc(itemSku);
+                itemName = esc(itemName);
+                itemStore = esc(itemStore);
+                itemDescription = esc(itemDescription);
                 let container = document.getElementById('supplies-rows');
                 let item = document.createElement('div');
                 item.id = `row-${Math.random().toString(36).substr(2, 9)}`; // Ensures unique ID
